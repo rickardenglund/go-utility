@@ -52,8 +52,3 @@ func doer(s string) (string, error) {
 
 	return s + s, nil
 }
-
-type todo struct {
-	ID    int    `json:"id"`
-	Title string `json:"title"`
-}
