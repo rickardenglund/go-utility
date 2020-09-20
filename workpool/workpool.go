@@ -12,10 +12,6 @@ func New(nWorkers int) WorkPool {
 	return WorkPool{nWorkers: nWorkers}
 }
 
-type apa struct {
-	apa string
-}
-
 func (wp *WorkPool) DoParallel(nJobs int, f func(workIndex int)) {
 	queue := make(chan int, wp.nWorkers)
 
