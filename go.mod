@@ -1,4 +1,4 @@
-module go-utility
+module github.com/rickardenglund/go-utility
 
 go 1.15
 

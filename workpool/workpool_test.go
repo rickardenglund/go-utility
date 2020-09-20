@@ -2,8 +2,9 @@ package workpool_test
 
 import (
 	"fmt"
-	"go-utility/workpool"
 	"testing"
+
+	"github.com/rickardenglund/go-utility/workpool"
 
 	"github.com/stretchr/testify/require"
 )
