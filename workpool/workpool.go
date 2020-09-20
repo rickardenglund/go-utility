@@ -1,6 +1,9 @@
 package workpool
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+)
 
 type WorkPool struct {
 	nWorkers int
@@ -11,6 +14,9 @@ func New(nWorkers int) WorkPool {
 }
 
 func (wp *WorkPool) DoParallel(nJobs int, f func(workIndex int)) {
+	if false {
+		fmt.Printf("apa")
+	}
 	queue := make(chan int, wp.nWorkers)
 
 	wg := sync.WaitGroup{}

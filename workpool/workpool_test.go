@@ -10,7 +10,6 @@ import (
 
 func TestDoWork(t *testing.T) {
 	wp := workpool.New(5)
-
 	work := []int{1, 2, 3, 4, 5}
 
 	wp.DoParallel(len(work),
