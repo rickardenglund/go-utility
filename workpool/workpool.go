@@ -1,6 +1,8 @@
 package workpool
 
-import "sync"
+import (
+	"sync"
+)
 
 type WorkPool struct {
 	nWorkers int

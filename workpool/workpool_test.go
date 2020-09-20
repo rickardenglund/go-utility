@@ -10,7 +10,6 @@ import (
 
 func TestDoWork(t *testing.T) {
 	wp := workpool.New(5)
-
 	work := []int{1, 2, 3, 4, 5}
 
 	wp.DoParallel(len(work),
@@ -51,9 +50,4 @@ func doer(s string) (string, error) {
 	}
 
 	return s + s, nil
-}
-
-type todo struct {
-	ID    int    `json:"id"`
-	Title string `json:"title"`
 }
