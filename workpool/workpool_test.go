@@ -1,8 +1,10 @@
 package workpool_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/rickardenglund/go-utility/workpool"
 
@@ -13,7 +15,7 @@ func TestDoWork(t *testing.T) {
 	wp := workpool.New(5)
 	work := []int{1, 2, 3, 4, 5}
 
-	wp.DoParallel(len(work),
+	wp.DoParallel(context.Background(), len(work),
 		func(i int) {
 			work[i] += 1
 		},
@@ -34,7 +36,7 @@ func TestDoComplex(t *testing.T) {
 	work := []string{"a", "aa", "b"}
 	res := make([]Response, len(work))
 
-	wp.DoParallel(len(work),
+	wp.DoParallel(context.Background(), len(work),
 		func(i int) {
 			res[i].r, res[i].err = doer(work[i])
 		},
@@ -53,13 +55,31 @@ func doer(s string) (string, error) {
 	return s + s, nil
 }
 
-func TestName(t *testing.T) {
+func TestAllworkIsDone(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
 	res := make([]int, 3)
 	wp := workpool.New(1)
-	wp.DoParallel(3, func(workIndex int) {
+
+	wp.DoParallel(ctx, 3, func(workIndex int) {
 		res[workIndex] = workIndex
 	})
 
 	require.Equal(t, []int{0, 1, 2}, res)
+}
 
+func TestCancelTerminates(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+
+	res := make([]int, 3)
+	wp := workpool.New(1)
+
+	wp.DoParallel(ctx, 3, func(workIndex int) {
+		fmt.Printf("sleeping: %v\n", time.Now().Nanosecond())
+		time.Sleep(time.Duration((workIndex+1)*50) * time.Millisecond)
+		res[workIndex] = workIndex + 1
+	})
+
+	require.NotEqual(t, []int{1, 2, 3}, res)
 }

@@ -1,6 +1,7 @@
 package workpool
 
 import (
+	"context"
 	"sync"
 )
 
@@ -12,28 +13,39 @@ func New(nWorkers int) WorkPool {
 	return WorkPool{nWorkers: nWorkers}
 }
 
-func (wp *WorkPool) DoParallel(nJobs int, f func(workIndex int)) {
+func (wp *WorkPool) DoParallel(ctx context.Context, nJobs int, f func(workIndex int)) {
 	queue := make(chan int)
 
 	wg := sync.WaitGroup{}
-	wg.Add(nJobs)
 
 	for i := 0; i < wp.nWorkers; i++ {
 		go func() {
+		loop:
 			for {
-				workIndex, more := <-queue
-				if !more {
-					break
-				}
+				select {
+				case wi, more := <-queue:
+					if !more {
+						break loop
+					}
 
-				defer wg.Done()
-				f(workIndex)
+					defer wg.Done()
+					f(wi)
+				case <-ctx.Done():
+					break loop
+				}
 			}
+
 		}()
 	}
 
 	for i := 0; i < nJobs; i++ {
-		queue <- i
+		wg.Add(1)
+		select {
+		case queue <- i:
+		case <-ctx.Done():
+			print("Canceled\n")
+			return
+		}
 	}
 
 	close(queue)
