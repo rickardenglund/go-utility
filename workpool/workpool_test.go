@@ -52,3 +52,14 @@ func doer(s string) (string, error) {
 
 	return s + s, nil
 }
+
+func TestName(t *testing.T) {
+	res := make([]int, 3)
+	wp := workpool.New(1)
+	wp.DoParallel(3, func(workIndex int) {
+		res[workIndex] = workIndex
+	})
+
+	require.Equal(t, []int{0, 1, 2}, res)
+
+}

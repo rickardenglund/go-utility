@@ -13,20 +13,22 @@ func New(nWorkers int) WorkPool {
 }
 
 func (wp *WorkPool) DoParallel(nJobs int, f func(workIndex int)) {
-	queue := make(chan int, wp.nWorkers)
+	queue := make(chan int)
 
 	wg := sync.WaitGroup{}
 	wg.Add(nJobs)
 
 	for i := 0; i < wp.nWorkers; i++ {
 		go func() {
-			workIndex, more := <-queue
-			if !more {
-				return
-			}
+			for {
+				workIndex, more := <-queue
+				if !more {
+					break
+				}
 
-			defer wg.Done()
-			f(workIndex)
+				defer wg.Done()
+				f(workIndex)
+			}
 		}()
 	}
 
